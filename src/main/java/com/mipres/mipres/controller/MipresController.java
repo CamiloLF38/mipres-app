@@ -2,8 +2,10 @@ package com.mipres.mipres.controller;
 
 import com.mipres.mipres.dto.MipresRequest;
 import com.mipres.mipres.entity.Mipres;
+import com.mipres.mipres.entity.Paciente;
 import com.mipres.mipres.service.MipresService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
