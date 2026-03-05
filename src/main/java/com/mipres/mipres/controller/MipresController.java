@@ -28,4 +28,17 @@ public class MipresController {
     public String getHelloWorld() {
         return mipresService.testHelloWorld();
     }
+
+    // Buscar MIPRES por la cedula de paciente
+    @GetMapping("/buscar-por-paciente/{cedula}")
+    public ResponseEntity<List<Mipres>> buscarPorPaciente(@PathVariable String cedula) {
+        List<Mipres> lista = mipresService.buscarPorCedulaPaciente(cedula);
+        return ResponseEntity.ok(lista);
+    }
+
+    // Crear un paciente
+    @PostMapping("/paciente")
+    public ResponseEntity<Paciente> crearPaciente(@RequestBody Paciente paciente) {
+        return ResponseEntity.ok(mipresService.guardarPaciente(paciente));
+    }
 }

@@ -36,6 +36,32 @@ public class MipresService {
         return mipresRepository.save(mipres);
     }
 
+    public Mipres actualizarMipres(Long id, MipresRequest request) {
+        Mipres mipres = mipresRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("MIPRES no encontrado"));
+        
+        mipres.setMedicamento(request.getMedicamento());
+        mipres.setMolecula(request.getMolecula());
+        mipres.setCantidadAplicacionesAutorizadas(request.getCantidadAplicacionesAutorizadas());
+        mipres.setFechaMaxDireccionamiento(request.getFechaMaxDireccionamiento());
+        // Puedes permitir cambiar el estado aquí también
+        return mipresRepository.save(mipres);
+    }
+
+    public List<Mipres> buscarPorCedulaPaciente(String cedula) {
+        // Primero verificamos si el paciente existe
+        Paciente paciente = pacienteRepository.findByDocumento(cedula)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado con esa cédula"));
+        
+        // Luego buscamos sus MIPRES. 
+        // Nota: Debes añadir este método en MipresRepository
+        return mipresRepository.findByPacienteId(paciente.getId());
+    }
+
+    public Paciente guardarPaciente(Paciente paciente) {
+        return pacienteRepository.save(paciente);
+    }
+
     public List<Mipres> listar() {
         return mipresRepository.findAll();
     }

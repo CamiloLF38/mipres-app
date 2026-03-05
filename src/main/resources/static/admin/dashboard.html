@@ -45,7 +45,7 @@
                             <p class="card-text text-muted">
                                 Registra, consulta y actualiza MIPRES.
                             </p>
-                            <button type="submit" class="btn btn-primary w-100 mb-3">Iniciar Sesión</button>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" id="btn-gestion-mipres">Gestionar MIPRES</button>
                         </div>
                     </div>
                 </div>
@@ -54,11 +54,11 @@
                 <div class="col-md-4">
                     <div class="card feature-card h-100 p-3">
                         <div class="card-body text-center">
-                            <h5 class="card-title fw-bold">Alertas Inteligentes</h5>
+                            <h5 class="card-title fw-bold">Gestion de pacientes</h5>
                             <p class="card-text text-muted">
-                                Recibe avisos antes del vencimiento, disponibilidad del medicamento
-                                y programación de infusiones.
+                                Registra Pacientes o actualiza sus datos.
                             </p>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" id="btn-nuevo-paciente">Gestionar MIPRES</button>
                         </div>
                     </div>
                 </div>
@@ -77,6 +77,9 @@
             </div>
         </section>
     
+        <section class="container mb-5">
+            <div id="dynamic-content" class="card shadow-sm p-4 d-none"></div>
+        </section>
     </main>
 
     <!-- FOOTER -->

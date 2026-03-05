@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface MipresRepository extends JpaRepository<Mipres, Long> {
     Optional<Mipres> findByNumeroMipres(String numeroMipres);
+
+    List<Mipres> findByPacienteDocumento(String documento);
 }
