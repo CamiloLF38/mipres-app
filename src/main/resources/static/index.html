@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIPRES App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="#">MIPRES App</a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+    
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto" id="navUserSection">
+                        <li class="nav-item" id="loginItem">
+                            <a class="nav-link" href="/compartidos/registro.html">Iniciar sesión / Registro</a>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+        </nav>
+    </header>
+
+    <!-- BODY -->
+    <main>
+        <!-- RESUMEN -->
+        <section class="container my-5">
+            <div class="hero p-5" id="heroResumen">
+                <h1 class="display-6 fw-bold">
+                    Gestión inteligente de MIPRES
+                </h1>
+                
+                <p class="fs-5 mt-3 mb-4 col-lg-8">
+                    Organiza tratamientos, recibe alertas preventivas y evita perder direccionamientos. Diseñada para cuidadores, pacientes y administrativos.
+                </p>
+    
+                <a id="btnRegistroLogin" href="/compartidos/registro.html" class="btn btn-light btn-lg fw-semibold">Iniciar ahora</a>
+            </div>
+        </section>
+    
+        <!-- FUNCIONALIDADES -->
+        <section class="container mb-5">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">¿Qué puedes hacer?</h2>
+                <p class="text-muted">Funciones clave para la gestión del tratamiento</p>
+            </div>
+    
+            <div class="row g-4">
+                
+                <!-- Card 1 -->
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold">Gestión de MIPRES</h5>
+                            <p class="card-text text-muted">
+                                Registra, consulta y controla la vigencia de los MIPRES de forma organizada.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 2 -->
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold">Alertas Inteligentes</h5>
+                            <p class="card-text text-muted">
+                                Recibe avisos antes del vencimiento, disponibilidad del medicamento
+                                y programación de infusiones.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 3 -->
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold">Reportes Administrativos</h5>
+                            <p class="card-text text-muted">
+                                Genera evidencia del tratamiento y seguimiento para EPS, IPS y auditores.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+        <!-- COMO FUNCIONA -->
+        <section class="container mb-5" id="seccionComoFunciona">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">¿Cómo funciona?</h2>
+            </div>
+    
+            <div class="row text-center g-4">
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <h4 class="fw-bold">1️⃣ Registra</h4>
+                        <p class="text-muted">Ingresa el número de MIPRES y datos del tratamiento.</p>
+                    </div>
+                </div>
+    
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <h4 class="fw-bold">2️⃣ Recibe alertas</h4>
+                        <p class="text-muted">La app te avisa antes de que venza el direccionamiento.</p>
+                    </div>
+                </div>
+    
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <h4 class="fw-bold">3️⃣ Gestiona</h4>
+                        <p class="text-muted">Programa infusiones y genera reportes fácilmente.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-4">
+        <div class="container text-center">
+            <small>© 2026 MIPRES App — Prototipo</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/registro.js"></script>
+    <script src="/js/index.js"></script>
+</body>
+</html>
