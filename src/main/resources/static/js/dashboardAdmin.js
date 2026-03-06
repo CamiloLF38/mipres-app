@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const datosInicioSesion = validarSesionIniciada();
-    llamarHelloWorld();
+    modificarNombreSaludo(datosInicioSesion);
 
     // Configurar botones de las Cards
     document.getElementById('btn-gestion-mipres').addEventListener('click', mostrarGestionMipres);
     document.getElementById('btn-nuevo-paciente').addEventListener('click', mostrarFormularioPaciente);
+    document.getElementById('btn-reportes').addEventListener('click', mostrarReportes);
 });
 
 function validarSesionIniciada(){
@@ -23,30 +24,9 @@ function validarSesionIniciada(){
     };
 }
 
-async function llamarHelloWorld() {
-    const token = sessionStorage.getItem('token');
-
-    if (!token) {
-        alert('No hay sesión activa');
-        return;
-    }
-
-    try {
-        const response = await fetch(serverPath + '/mipres/helloWorld', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        const data = await response.text();
-
-        const helloWorldP = document.getElementById("testHelloWorld");
-        helloWorldP.innerText = data;
-    } catch (error) {
-        
-    }
+async function modificarNombreSaludo(datosInicioSesion) {
+    const nombreUsuario = datosInicioSesion.datosUsuario.nombre;
+    document.getElementById('sauldo-usuario-dashboard').innerText = "Hola "+nombreUsuario+",";
 }
 
 // --- GESTION Y BUSQUEDA DE MIPRES ---
@@ -437,4 +417,131 @@ async function guardarPaciente(event) {
         console.error("Error en la petición:", error);
         alert("Error de conexión con el servidor");
     }
+}
+
+// --- GENERACION DE REPORTES ---
+let datosReporteActual = []; // Variable global para la exportación
+
+function mostrarReportes() {
+    const container = document.getElementById('dynamic-content');
+    container.classList.remove('d-none');
+
+    container.innerHTML = `
+        <h4 class="mb-4">Reportes Administrativos</h4>
+        <div class="d-flex gap-4 mb-4">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="opcionReporte" id="repPendiente" value="PENDIENTE">
+                <label class="form-check-label" for="repPendiente">MIPRES Pendientes</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="opcionReporte" id="repDireccionado" value="DIRECCIONADO">
+                <label class="form-check-label" for="repDireccionado">MIPRES Direccionados</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="opcionReporte" id="repVencido" value="VENCIDO">
+                <label class="form-check-label" for="repVencido">MIPRES Vencidos</label>
+            </div>
+        </div>
+        <div id="controles-reporte" class="d-none mb-3 text-end">
+            <button class="btn btn-outline-success" onclick="exportarExcel()">
+                <i class="bi bi-file-earmark-excel"></i> Descargar Reporte (Excel)
+            </button>
+        </div>
+        <hr>
+        <div id="tabla-reporte-container"></div>
+    `;
+
+    // Escuchar cambios en los radio buttons de reportes
+    document.querySelectorAll('input[name="opcionReporte"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            generarReportePorEstado(e.target.value);
+        });
+    });
+}
+
+async function generarReportePorEstado(estado) {
+    const token = sessionStorage.getItem('token');
+    const container = document.getElementById('tabla-reporte-container');
+    const controles = document.getElementById('controles-reporte');
+
+    try {
+        const response = await fetch(`${serverPath}/mipres/listar`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const todosLosMipres = await response.json();
+
+        // Filtrar por el estado seleccionado
+        datosReporteActual = todosLosMipres.filter(m => m.estado === estado);
+
+        if (datosReporteActual.length === 0) {
+            container.innerHTML = `<div class="alert alert-warning">No hay registros con estado: ${estado}</div>`;
+            controles.classList.add('d-none');
+            return;
+        }
+
+        controles.classList.remove('d-none');
+        renderizarTablaSimple(datosReporteActual, container);
+    } catch (error) {
+        container.innerHTML = `<div class="alert alert-danger">Error al cargar el reporte.</div>`;
+    }
+}
+
+function renderizarTablaSimple(lista, target) {
+    let html = `
+        <table class="table table-striped table-sm mt-2" id="tabla-datos-exportar">
+            <thead class="table-dark">
+                <tr>
+                    <th>No. MIPRES</th>
+                    <th>Cédula</th>
+                    <th>Paciente</th>
+                    <th>Medicamento</th>
+                    <th>Fecha Máx.</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${lista.map(m => `
+                    <tr>
+                        <td>${m.numeroMipres}</td>
+                        <td>${m.paciente?.cedula || 'N/A'}</td>
+                        <td>${m.paciente?.nombre || 'N/A'}</td>
+                        <td>${m.medicamento}</td>
+                        <td>${m.fechaMaxDireccionamiento}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>`;
+    target.innerHTML = html;
+}
+
+function exportarExcel() {
+    if (datosReporteActual.length === 0) return;
+
+    // Encabezados
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Numero MIPRES,Cedula,Paciente,Medicamento,Molecula,Cantidad,Fecha Max,Estado\n";
+
+    // Filas
+    datosReporteActual.forEach(m => {
+        const fila = [
+            m.numeroMipres,
+            m.paciente?.cedula || 'N/A',
+            m.paciente?.nombre || 'N/A',
+            m.medicamento,
+            m.molecula,
+            m.cantidadAplicacionesAutorizadas,
+            m.fechaMaxDireccionamiento,
+            m.estado
+        ].join(",");
+        csvContent += fila + "\n";
+    });
+
+    // Crear link de descarga
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    const fecha = new Date().toISOString().slice(0,10);
+    link.setAttribute("download", `Reporte_MIPRES_${fecha}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
