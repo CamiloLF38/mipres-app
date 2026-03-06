@@ -184,7 +184,7 @@ async function guardarNuevoMipres(event) {
 
     const nuevoMipres = {
         numeroMipres: document.getElementById('num-mipres').value,
-        pacienteId: document.getElementById('num-paciente-id').value,
+        pacienteCedula: document.getElementById('num-paciente-id').value,
         medicamento: document.getElementById('med-nombre').value,
         molecula: document.getElementById('med-molecula').value,
         cantidadAplicacionesAutorizadas: parseInt(document.getElementById('med-cantidad').value),
@@ -264,7 +264,7 @@ function mostrarFormularioNuevoMipres() {
         <form id="form-registro-mipres" class="row g-3" onsubmit="guardarNuevoMipres(event)">
             <div class="col-md-6">
                 <label class="form-label">ID del Paciente (Sistema)</label>
-                <input type="number" id="num-paciente-id" class="form-control" placeholder="Ej: 1" required>
+                <input type="text" id="num-paciente-id" class="form-control" placeholder="Ej: 1" required>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Número de MIPRES</label>

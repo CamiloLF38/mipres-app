@@ -7,7 +7,7 @@ import java.time.LocalDate;
 @Data
 public class MipresRequest {
     private String numeroMipres;
-    private Long pacienteId;
+    private String pacienteCedula;
     private String medicamento;
     private String molecula;
     private Integer cantidadAplicacionesAutorizadas;

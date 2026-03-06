@@ -19,7 +19,7 @@ public class MipresService {
 
     public Mipres crearMipres(MipresRequest request) {
 
-        Paciente paciente = pacienteRepository.findById(request.getPacienteId())
+        Paciente paciente = pacienteRepository.findByDocumento(request.getPacienteCedula())
                 .orElseThrow(() -> new RuntimeException("Paciente no existe"));
 
         Mipres mipres = Mipres.builder()
