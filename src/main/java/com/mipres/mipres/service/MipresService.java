@@ -44,7 +44,7 @@ public class MipresService {
         mipres.setMolecula(request.getMolecula());
         mipres.setCantidadAplicacionesAutorizadas(request.getCantidadAplicacionesAutorizadas());
         mipres.setFechaMaxDireccionamiento(request.getFechaMaxDireccionamiento());
-        // Puedes permitir cambiar el estado aquí también
+        mipres.setEstado(request.getEstado());
         return mipresRepository.save(mipres);
     }
 
