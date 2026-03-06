@@ -32,7 +32,45 @@
 
     <!-- BODY -->
     <main class="d-flex align-items-center justify-content-center register-form">
-    
+        <div class="text-center mb-4">
+            <h2 class="fw-bold" id="sauldo-usuario-dashboard"></h2>
+            <p class="text-muted">¿Qué quieres hacer?</p>
+        </div>
+
+        <section class="container mb-5">
+            <div class="row g-4">
+                <!-- Card 1 -->
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold">Gestion de pacientes</h5>
+                            <p class="card-text text-muted">
+                                Registra Pacientes o actualiza sus datos.
+                            </p>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" id="btn-nuevo-paciente">Gestionar paciente</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold">Consulta MIPRES</h5>
+                            <p class="card-text text-muted">
+                                Consulta el estado MIPRES de tus pacientes.
+                            </p>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" id="btn-consultar-mipres">Consultar MIPRES</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="container mb-5">
+            <div id="dynamic-content" class="card shadow-sm p-4 d-none"></div>
+        </section>
     </main>
 
     <!-- FOOTER -->
