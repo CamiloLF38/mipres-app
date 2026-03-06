@@ -43,4 +43,14 @@ public class MipresController {
     public ResponseEntity<Paciente> crearPaciente(@RequestBody Paciente paciente) {
         return ResponseEntity.ok(mipresService.guardarPaciente(paciente));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Mipres> actualizar(@PathVariable Long id, @RequestBody MipresRequest request) {
+        return ResponseEntity.ok(mipresService.actualizarMipres(id, request));
+    }
+
+    @GetMapping("/buscar-por-numero/{numero}")
+    public ResponseEntity<Mipres> buscarPorNumero(@PathVariable String numero) {
+        return ResponseEntity.ok(mipresService.buscarPorNumeroMipres(numero));
+    }
 }

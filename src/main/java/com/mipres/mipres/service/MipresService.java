@@ -69,4 +69,9 @@ public class MipresService {
     public String testHelloWorld(){
         return "Hello World";
     }
+
+    public Mipres buscarPorNumeroMipres(String numero) {
+        return mipresRepository.findByNumeroMipres(numero)
+                .orElseThrow(() -> new RuntimeException("MIPRES no encontrado"));
+    }
 }

@@ -50,18 +50,86 @@ async function llamarHelloWorld() {
 }
 
 // --- GESTION Y BUSQUEDA DE MIPRES ---
-async function mostrarGestionMipres() {
+function mostrarGestionMipres() {
     const container = document.getElementById('dynamic-content');
     container.classList.remove('d-none');
-    
+
+    // Inyectamos la estructura base con los Radio Buttons
     container.innerHTML = `
-        <h4 class="mb-3">Gestión de MIPRES</h4>
-        <div class="input-group mb-4">
-            <input type="text" id="search-cedula" class="form-control" placeholder="Cédula del Paciente">
-            <button class="btn btn-primary" onclick="buscarPacienteYMipres()">Buscar</button>
+        <h4 class="mb-4">Gestión de MIPRES</h4>
+        <div class="d-flex gap-4 mb-4">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="opcionMipres" id="radioNuevo" value="nuevo">
+                <label class="form-check-label" for="radioNuevo">Ingresar nuevo Registro</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="opcionMipres" id="radioConsultar" value="consultar">
+                <label class="form-check-label" for="radioConsultar">Consultar Registro Existente</label>
+            </div>
         </div>
-        <div id="resultado-busqueda"></div>
+        <hr>
+        <div id="mipres-form-container">
+            </div>
+        <div id="resultado-busqueda" class="mt-4"></div>
     `;
+
+    // Escuchar cambios en los radio buttons
+    document.querySelectorAll('input[name="opcionMipres"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'nuevo') {
+                mostrarFormularioNuevoMipres();
+            } else {
+                mostrarInterfazConsulta();
+            }
+        });
+    });
+}
+
+function mostrarInterfazConsulta() {
+    const subContainer = document.getElementById('mipres-form-container');
+    subContainer.innerHTML = `
+        <h5>Consultar Registro</h5>
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Buscar por:</label>
+                <select id="tipo-busqueda" class="form-select">
+                    <option value="cedula">Cédula de Paciente</option>
+                    <option value="numero">Número de MIPRES</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Dato a buscar</label>
+                <input type="text" id="valor-busqueda" class="form-control" placeholder="Ingrese el valor...">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" onclick="ejecutarBusqueda()">Buscar</button>
+            </div>
+        </div>
+    `;
+}
+
+async function ejecutarBusqueda() {
+    const tipo = document.getElementById('tipo-busqueda').value;
+    const valor = document.getElementById('valor-busqueda').value;
+    const token = sessionStorage.getItem('token');
+
+    let url = (tipo === 'cedula')
+        ? `${serverPath}/mipres/buscar-por-paciente/${valor}`
+        : `${serverPath}/mipres/buscar-por-numero/${valor}`;
+
+    try {
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        // Si es por número de MIPRES devuelve un objeto único, lo convertimos a lista para la tabla
+        const lista = Array.isArray(data) ? data : [data];
+        renderizarTablaMipres(lista);
+    } catch (error) {
+        document.getElementById('resultado-busqueda').innerHTML =
+            `<p class="text-danger">No se encontraron resultados para la búsqueda.</p>`;
+    }
 }
 
 async function buscarPacienteYMipres() {
@@ -77,6 +145,68 @@ async function buscarPacienteYMipres() {
         renderizarTablaMipres(data);
     } catch (error) {
         document.getElementById('resultado-busqueda').innerHTML = `<p class="text-danger">No se encontró el paciente.</p>`;
+    }
+}
+
+async function actualizarMipresEnServer(idMipres, event) {
+    event.preventDefault();
+    const token = sessionStorage.getItem('token');
+
+    const datosActualizados = {
+        medicamento: document.getElementById('edit-medicamento').value,
+        molecula: document.getElementById('edit-molecula').value,
+        cantidadAplicacionesAutorizadas: parseInt(document.getElementById('edit-cantidad').value),
+        fechaMaxDireccionamiento: document.getElementById('edit-fechaMax').value
+    };
+
+    try {
+        const response = await fetch(`${serverPath}/mipres/${idMipres}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(datosActualizados)
+        });
+
+        if (response.ok) {
+            alert("MIPRES actualizado correctamente");
+            mostrarGestionMipres(); // Recarga la vista de gestión
+        }
+    } catch (error) {
+        alert("Error al actualizar");
+    }
+}
+
+async function guardarNuevoMipres(event) {
+    event.preventDefault();
+    const token = sessionStorage.getItem('token');
+
+    const nuevoMipres = {
+        numeroMipres: document.getElementById('num-mipres').value,
+        pacienteId: document.getElementById('num-paciente-id').value,
+        medicamento: document.getElementById('med-nombre').value,
+        molecula: document.getElementById('med-molecula').value,
+        cantidadAplicacionesAutorizadas: parseInt(document.getElementById('med-cantidad').value),
+        fechaMaxDireccionamiento: document.getElementById('med-fecha').value
+    };
+
+    try {
+        const response = await fetch(`${serverPath}/mipres`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(nuevoMipres)
+        });
+
+        if(response.ok) {
+            alert("MIPRES registrado con éxito");
+            mostrarFormularioNuevoMipres(); // Reset form
+        }
+    } catch (error) {
+        alert("Error al guardar");
     }
 }
 
@@ -105,6 +235,62 @@ function renderizarTablaMipres(mipresList) {
     
     html += `</tbody></table>`;
     document.getElementById('resultado-busqueda').innerHTML = html;
+}
+
+function editarMipres(idMipres) {
+    const container = document.getElementById('dynamic-content');
+    // Aquí podrías hacer un fetch previo para obtener los datos actuales si quisieras,
+    // o simplemente mostrar el formulario vacío para sobreescribir.
+
+    container.innerHTML = `
+        <h4 class="mb-3">Editar MIPRES ID: ${idMipres}</h4>
+        <form onsubmit="actualizarMipresEnServer(${idMipres}, event)">
+            <div class="mb-3"><input type="text" id="edit-medicamento" class="form-control" placeholder="Medicamento" required></div>
+            <div class="mb-3"><input type="text" id="edit-molecula" class="form-control" placeholder="Molécula" required></div>
+            <div class="mb-3"><input type="number" id="edit-cantidad" class="form-control" placeholder="Cantidad" required></div>
+            <div class="mb-3"><input type="date" id="edit-fechaMax" class="form-control" required></div>
+            <button type="submit" class="btn btn-warning">Confirmar Cambios</button>
+            <button type="button" class="btn btn-secondary" onclick="mostrarGestionMipres()">Cancelar</button>
+        </form>
+    `;
+}
+
+function mostrarFormularioNuevoMipres() {
+    const subContainer = document.getElementById('mipres-form-container');
+    document.getElementById('resultado-busqueda').innerHTML = ""; // Limpiar tablas previas
+
+    subContainer.innerHTML = `
+        <h5>Nuevo Registro de MIPRES</h5>
+        <form id="form-registro-mipres" class="row g-3" onsubmit="guardarNuevoMipres(event)">
+            <div class="col-md-6">
+                <label class="form-label">ID del Paciente (Sistema)</label>
+                <input type="number" id="num-paciente-id" class="form-control" placeholder="Ej: 1" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Número de MIPRES</label>
+                <input type="text" id="num-mipres" class="form-control" placeholder="2026..." required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Medicamento</label>
+                <input type="text" id="med-nombre" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Molécula</label>
+                <input type="text" id="med-molecula" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Cantidad Autorizada</label>
+                <input type="number" id="med-cantidad" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Fecha Máxima</label>
+                <input type="date" id="med-fecha" class="form-control" required>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-success">Guardar Registro</button>
+            </div>
+        </form>
+    `;
 }
 
 // --- INSERTAR NUEVO PACIENTE ---
@@ -143,24 +329,39 @@ async function buscarPaciente() {
     }
 }
 
-async function guardarNuevoMipres() {
-    const nuevoMipres = {
-        numeroMipres: document.getElementById('numMipres').value,
-        pacienteId: idPacienteSeleccionado, // Obtenido tras la búsqueda
-        medicamento: document.getElementById('medicamento').value,
-        molecula: document.getElementById('molecula').value,
-        cantidadAplicacionesAutorizadas: parseInt(document.getElementById('cantidad').value),
-        fechaMaxDireccionamiento: document.getElementById('fechaMax').value
+async function guardarPaciente(event) {
+    event.preventDefault(); // Evita que la página se recargue
+
+    const token = sessionStorage.getItem('token');
+    const nombre = document.getElementById('pac-nombre').value;
+    const documento = document.getElementById('pac-documento').value;
+
+    const nuevoPaciente = {
+        nombre: nombre,
+        documento: documento
     };
 
-    const response = await fetch(`${serverPath}/mipres`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-        },
-        body: JSON.stringify(nuevoMipres)
-    });
-    
-    if(response.ok) alert("MIPRES registrado con éxito");
+    try {
+        const response = await fetch(`${serverPath}/mipres/paciente`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(nuevoPaciente)
+        });
+
+        if (response.ok) {
+            alert("Paciente guardado con éxito");
+            document.getElementById('form-nuevo-paciente').reset();
+            // Opcional: ocultar el contenedor después de guardar
+            // document.getElementById('dynamic-content').classList.add('d-none');
+        } else {
+            const errorData = await response.json();
+            alert("Error: " + (errorData.message || "No se pudo guardar el paciente"));
+        }
+    } catch (error) {
+        console.error("Error en la petición:", error);
+        alert("Error de conexión con el servidor");
+    }
 }
