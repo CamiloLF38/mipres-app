@@ -19,7 +19,7 @@ public class MipresService {
 
     public Mipres crearMipres(MipresRequest request) {
 
-        Paciente paciente = pacienteRepository.findByDocumento(request.getPacienteCedula())
+        Paciente paciente = pacienteRepository.findByCedula(request.getPacienteCedula())
                 .orElseThrow(() -> new RuntimeException("Paciente no existe"));
 
         Mipres mipres = Mipres.builder()
@@ -50,12 +50,9 @@ public class MipresService {
 
     public List<Mipres> buscarPorCedulaPaciente(String cedula) {
         // Primero verificamos si el paciente existe
-        Paciente paciente = pacienteRepository.findByDocumento(cedula)
+        Paciente paciente = pacienteRepository.findByCedula(cedula)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado con esa cédula"));
-        
-        // Luego buscamos sus MIPRES. 
-        // Nota: Debes añadir este método en MipresRepository
-        return mipresRepository.findByPacienteId(paciente.getId());
+        return mipresRepository.findByPacienteCedula(cedula);
     }
 
     public Paciente guardarPaciente(Paciente paciente) {

@@ -20,7 +20,7 @@ public class Paciente {
     private String nombre;
 
     @Column(unique = true)
-    private String documento;
+    private String cedula;
 
     // cuidador opcional
     @ManyToOne(optional = true)
