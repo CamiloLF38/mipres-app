@@ -53,4 +53,27 @@ public class MipresController {
     public ResponseEntity<Mipres> buscarPorNumero(@PathVariable String numero) {
         return ResponseEntity.ok(mipresService.buscarPorNumeroMipres(numero));
     }
+
+    // Listar pacientes de un cuidador específico
+    @GetMapping("/pacientes-por-cuidador/{cedula}")
+    public ResponseEntity<List<Paciente>> listarPorCuidador(@PathVariable String cedula) {
+        return ResponseEntity.ok(mipresService.listarPacientesPorCuidador(cedula));
+    }
+
+    // Desasociar un paciente (quitarle el cuidador)
+    @PutMapping("/desasociar-paciente/{id}")
+    public ResponseEntity<Void> desasociar(@PathVariable Long id) {
+        mipresService.desasociarPaciente(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/registrar-vincular-paciente")
+    public ResponseEntity<Paciente> registrarVincular(@RequestBody Paciente paciente, @RequestParam String cedulaCuidador) {
+        return ResponseEntity.ok(mipresService.registrarOVincularPaciente(paciente, cedulaCuidador));
+    }
+
+    @GetMapping("/vencimientos-cuidador/{cedulaCuidador}")
+    public ResponseEntity<List<Mipres>> obtenerVencimientos(@PathVariable String cedulaCuidador) {
+        return ResponseEntity.ok(mipresService.listarVencimientosCuidador(cedulaCuidador));
+    }
 }
