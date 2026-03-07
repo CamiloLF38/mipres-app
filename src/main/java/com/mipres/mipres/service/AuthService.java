@@ -2,8 +2,10 @@ package com.mipres.mipres.service;
 
 import com.mipres.mipres.dto.AuthenticationResponse;
 import com.mipres.mipres.dto.RegisterRequest;
+import com.mipres.mipres.entity.Paciente;
 import com.mipres.mipres.entity.Usuario;
 import com.mipres.mipres.entity.Rol;
+import com.mipres.mipres.repository.PacienteRepository;
 import com.mipres.mipres.repository.UsuarioRepository;
 import com.mipres.mipres.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
     private final UsuarioRepository usuarioRepository;
+    private final PacienteRepository pacienteRepository; // Inyectamos el repositorio de pacientes
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -27,11 +30,15 @@ public class AuthService {
                 .nombre(request.getNombre())
                 .numeroCedula(request.getNumeroCedula())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .rol(request.getRol())   //control del backend
-                .activo(true)     //control del backend
+                .rol(request.getRol())
+                .activo(true)
                 .build();
 
-        usuarioRepository.save(usuario);
+        Usuario usuarioGuardado = usuarioRepository.save(usuario);
+
+        if (request.getRol() == Rol.PACIENTE) {
+            vincularOCrearPaciente(usuarioGuardado, request);
+        }
 
         //generar JWT
         var jwtToken = jwtService.generateToken(usuario.getNumeroCedula(), usuario.getRol().name());
@@ -39,6 +46,27 @@ public class AuthService {
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    private void vincularOCrearPaciente(Usuario usuario, RegisterRequest request) {
+        // Buscamos si ya existe un registro de paciente con esa cédula
+        pacienteRepository.findByCedula(usuario.getNumeroCedula())
+            .ifPresentOrElse(pacienteExistente -> {
+                // CASO: El registro ya existe (creado por Admin o Cuidador)
+                // Actualizamos el nombre y vinculamos el ID del nuevo usuario
+                pacienteExistente.setUsuario(usuario);
+                pacienteExistente.setNombre(usuario.getNombre());
+                pacienteRepository.save(pacienteExistente);
+            }, () -> {
+                // CASO: El paciente no existe en el sistema
+                // Creamos el registro de paciente vinculado al usuario
+                Paciente nuevoPaciente = Paciente.builder()
+                    .nombre(usuario.getNombre())
+                    .cedula(usuario.getNumeroCedula())
+                    .usuario(usuario)
+                    .build();
+                pacienteRepository.save(nuevoPaciente);
+            });
     }
 
     public AuthenticationResponse login(String cedula, String password) {
